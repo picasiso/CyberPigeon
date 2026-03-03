@@ -106,6 +106,9 @@ func (msg *Messaging) waitForSMSReceived(ctx context.Context, conn *dbus.Conn, p
 	if interval <= 0 {
 		interval = 100 * time.Millisecond
 	}
+
+	const maxWait = 30 * time.Second
+	deadline := time.After(maxWait)
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
 
@@ -121,6 +124,10 @@ func (msg *Messaging) waitForSMSReceived(ctx context.Context, conn *dbus.Conn, p
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
+		case <-deadline:
+			// 超时后返回当前状态的短信，避免永久阻塞
+			slog.Warn("等待短信接收超时，返回当前状态", "path", path, "state", sms.State.String())
+			return sms, nil
 		case <-ticker.C:
 		}
 	}

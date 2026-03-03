@@ -61,6 +61,9 @@ func (f *Forwarder) Run(ctx context.Context) error {
 		return nil
 	}
 
+	// 启动定期清理 processed map
+	go f.cleanupProcessed(ctx)
+
 	// 获取现有调制解调器
 	modems, err := f.manager.Modems()
 	if err != nil {
@@ -194,7 +197,11 @@ func (f *Forwarder) handleMessage(m *modem.Modem, sms *modem.SMS) error {
 	// incoming := sms.State == modem.SMSStateReceived || sms.State == modem.SMSStateReceiving
 
 	smsPath := sms.Path()
-	slog.Info("handleMessage调用", "path", smsPath, "from", sms.Number, "state", sms.State.String(), "text_preview", sms.Text[:min(20, len(sms.Text))])
+	textPreview := sms.Text
+	if len(textPreview) > 20 {
+		textPreview = textPreview[:20]
+	}
+	slog.Info("handleMessage调用", "path", smsPath, "from", sms.Number, "state", sms.State.String(), "text_preview", textPreview)
 
 	// 优先过滤旧消息（避免重启后重复发送）
 	// if incoming && !sms.Timestamp.IsZero() && time.Since(sms.Timestamp) > 5*time.Minute {
@@ -230,17 +237,16 @@ func (f *Forwarder) handleMessage(m *modem.Modem, sms *modem.SMS) error {
 	}
 
 	// 转发到通知通道
-	if len(f.cfg.Channels) > 0 {
-		f.mu.Lock()
-		n := f.notifier
-		f.mu.Unlock()
+	f.mu.Lock()
+	n := f.notifier
+	hasChannels := len(f.cfg.Channels) > 0
+	f.mu.Unlock()
 
+	if hasChannels && n != nil {
 		msg := f.formatMessage(m, sms)
-		if n != nil {
-			if err := n.Send(msg); err != nil {
-				slog.Error("发送通知失败", "error", err)
-				return err
-			}
+		if err := n.Send(msg); err != nil {
+			slog.Error("发送通知失败", "error", err)
+			return err
 		}
 	}
 
@@ -258,17 +264,9 @@ func (f *Forwarder) isDuplicateSMS(sms *modem.SMS) bool {
 	key := hex.EncodeToString(h[:])
 
 	now := time.Now()
-	cutoff := now.Add(-2 * time.Hour)
 
 	f.mu.Lock()
 	defer f.mu.Unlock()
-
-	// 清理过期记录
-	for k, t := range f.processed {
-		if t.Before(cutoff) {
-			delete(f.processed, k)
-		}
-	}
 
 	if lastTime, exists := f.processed[key]; exists {
 		slog.Debug("检测到重复短信", "last_processed", lastTime, "gap_ms", now.Sub(lastTime).Milliseconds())
@@ -277,6 +275,28 @@ func (f *Forwarder) isDuplicateSMS(sms *modem.SMS) bool {
 	f.processed[key] = now
 	slog.Debug("短信首次处理")
 	return false
+}
+
+// cleanupProcessed 定期清理过期的已处理记录
+func (f *Forwarder) cleanupProcessed(ctx context.Context) {
+	ticker := time.NewTicker(10 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			cutoff := time.Now().Add(-2 * time.Hour)
+			f.mu.Lock()
+			for k, t := range f.processed {
+				if t.Before(cutoff) {
+					delete(f.processed, k)
+				}
+			}
+			f.mu.Unlock()
+		}
+	}
 }
 
 // ReloadChannels 重载通知通道配置

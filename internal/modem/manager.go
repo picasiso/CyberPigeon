@@ -132,6 +132,14 @@ func (m *Manager) Conn() *dbus.Conn {
 	return m.conn
 }
 
+// Close 关闭 D-Bus 连接
+func (m *Manager) Close() error {
+	if m.conn != nil {
+		return m.conn.Close()
+	}
+	return nil
+}
+
 // ModemEventType 调制解调器事件类型
 type ModemEventType int
 

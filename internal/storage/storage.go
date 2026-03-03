@@ -64,6 +64,7 @@ func (s *Storage) Save(modemIMEI string, sms *modem.SMS) error {
 
 	// 检查是否已存在
 	if s.ids[id] {
+		s.mu.Unlock()
 		return nil // 已存在，跳过
 	}
 
@@ -79,6 +80,9 @@ func (s *Storage) Save(modemIMEI string, sms *modem.SMS) error {
 	s.messages = append(s.messages, msg)
 	s.ids[id] = true
 	handler := s.messageHandler
+
+	// 在锁内完成持久化，与 Delete 保持一致，避免数据竞争
+	err := s.save()
 	s.mu.Unlock()
 
 	// 触发新消息回调（在解锁后执行，避免阻塞）
@@ -86,7 +90,7 @@ func (s *Storage) Save(modemIMEI string, sms *modem.SMS) error {
 		go handler(msg)
 	}
 
-	return s.save()
+	return err
 }
 
 // Has 检查消息是否存在

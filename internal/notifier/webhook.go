@@ -97,7 +97,6 @@ func (w *WebhookChannel) Send(msg Message) error {
 	}
 
 	var req *http.Request
-	var err error
 
 	if strings.ToUpper(w.cfg.Method) == "GET" {
 		// GET 请求
@@ -113,7 +112,11 @@ func (w *WebhookChannel) Send(msg Message) error {
 			fullURL += "?" + params.Encode()
 		}
 
+		var err error
 		req, err = http.NewRequest("GET", fullURL, nil)
+		if err != nil {
+			return err
+		}
 	} else {
 		// POST 请求
 		data, err := json.Marshal(payload)
@@ -125,10 +128,6 @@ func (w *WebhookChannel) Send(msg Message) error {
 			return err
 		}
 		req.Header.Set("Content-Type", "application/json")
-	}
-
-	if err != nil {
-		return err
 	}
 
 	// 添加自定义头

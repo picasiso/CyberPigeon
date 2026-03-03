@@ -125,8 +125,20 @@
             width: 8px;
             height: 8px;
             background: var(--status-success);
+            border-radius: 50%;
             display: inline-block;
             margin-right: 6px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-dot.disconnected {
+            background: var(--signal-poor);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
 
         .status-text {
@@ -144,6 +156,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             transition: all 0.2s;
+            border-radius: 4px;
         }
 
         .theme-toggle:hover {
@@ -162,6 +175,7 @@
             letter-spacing: 0.5px;
             transition: all 0.2s;
             position: relative;
+            border-radius: 4px;
         }
 
         .modem-toggle:hover {
@@ -173,6 +187,7 @@
             background: var(--accent-primary);
             border-color: var(--accent-primary);
             color: var(--bg-primary);
+            border-radius: 4px;
         }
 
         /* TAB 标签页 */
@@ -271,6 +286,12 @@
             border: 1px solid var(--border-primary);
             padding: 16px;
             margin-bottom: 12px;
+            border-radius: 6px;
+            transition: border-color 0.2s;
+        }
+
+        .channel-card:hover {
+            border-color: var(--border-secondary);
         }
 
         .channel-header {
@@ -295,7 +316,7 @@
             padding: 4px 8px;
             background: var(--accent-primary);
             color: white;
-            border-radius: 2px;
+            border-radius: 4px;
             font-size: 11px;
             font-weight: 600;
             text-transform: uppercase;
@@ -338,6 +359,7 @@
             padding: 8px 12px;
             font-size: 13px;
             transition: border-color 0.2s;
+            border-radius: 4px;
         }
 
         .field-input:focus {
@@ -363,6 +385,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             transition: opacity 0.2s;
+            border-radius: 4px;
         }
 
         .save-channels-btn:hover {
@@ -432,6 +455,7 @@
             border: 1px solid var(--border-primary);
             padding: 20px;
             margin-bottom: 16px;
+            border-radius: 6px;
         }
 
         .modem-name {
@@ -476,6 +500,8 @@
             height: 4px;
             background: var(--border-primary);
             position: relative;
+            border-radius: 2px;
+            overflow: hidden;
         }
 
         .signal-fill {
@@ -543,6 +569,7 @@
             color: var(--text-primary);
             padding: 8px 12px;
             font-size: 13px;
+            border-radius: 4px;
         }
 
         .ussd-btn {
@@ -555,6 +582,7 @@
             text-transform: uppercase;
             white-space: nowrap;
             flex-shrink: 0;
+            border-radius: 4px;
         }
 
         .ussd-btn:disabled {
@@ -570,6 +598,13 @@
             font-size: 13px;
             color: var(--text-secondary);
             white-space: pre-wrap;
+            border-radius: 4px;
+        }
+
+        .ussd-error {
+            color: var(--error-text);
+            font-size: 12px;
+            margin-top: 4px;
         }
 
         /* 主内容区 */
@@ -607,14 +642,16 @@
         .message-item {
             background: var(--bg-secondary);
             border: 1px solid var(--border-primary);
-            border-left: 2px solid var(--accent-primary);
+            border-left: 3px solid var(--accent-primary);
             padding: 24px;
-            margin-bottom: 1px;
-            transition: background 0.2s;
+            margin-bottom: 8px;
+            transition: background 0.2s, box-shadow 0.2s;
+            border-radius: 6px;
         }
 
         .message-item:hover {
             background: var(--bg-tertiary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .message-header {
@@ -663,6 +700,7 @@
             font-size: 12px;
             cursor: pointer;
             transition: all 0.2s;
+            border-radius: 4px;
         }
 
         .delete-btn:hover {
@@ -683,6 +721,8 @@
             padding: 10px 16px;
             font-size: 14px;
             transition: border-color 0.2s;
+            border-radius: 6px;
+            box-sizing: border-box;
         }
 
         .search-input:focus {
@@ -714,6 +754,7 @@
             padding: 32px;
             max-width: 400px;
             width: 90%;
+            border-radius: 8px;
         }
 
         .modal-title {
@@ -746,6 +787,7 @@
             transition: all 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            border-radius: 4px;
         }
 
         .modal-btn:hover {
@@ -817,6 +859,7 @@
             margin: 20px;
             text-align: center;
             font-size: 13px;
+            border-radius: 6px;
         }
 
         /* 滚动条 */
@@ -831,10 +874,125 @@
 
         ::-webkit-scrollbar-thumb {
             background: var(--border-secondary);
+            border-radius: 3px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
             background: var(--text-tertiary);
+        }
+
+        /* Toast 通知 */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            pointer-events: auto;
+            animation: toastIn 0.3s ease forwards;
+            max-width: 360px;
+            word-break: break-word;
+            line-height: 1.5;
+        }
+
+        .toast.toast-out {
+            animation: toastOut 0.3s ease forwards;
+        }
+
+        .toast.success {
+            background: #2ecc71;
+        }
+
+        .toast.error {
+            background: #e74c3c;
+        }
+
+        .toast.info {
+            background: var(--accent-primary);
+        }
+
+        .toast.warning {
+            background: #f39c12;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(40px); }
+        }
+
+        /* 侧边栏遮罩 */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 150;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 通道添加按钮 */
+        .add-channel-btn {
+            background: transparent;
+            border: 1px dashed var(--border-secondary);
+            color: var(--text-tertiary);
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .add-channel-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .add-channel-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 通道删除按钮 */
+        .remove-channel-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 2px 6px;
+            transition: color 0.2s;
+            border-radius: 4px;
+        }
+
+        .remove-channel-btn:hover {
+            color: #ff5252;
         }
 
         /* 响应式 */
@@ -880,8 +1038,8 @@
                     <div class="logo">SMS FORWARDER</div>
                 </div>
                 <div class="topbar-right">
-                    <div class="status-text" v-if="lastUpdate">
-                        <span class="status-dot"></span>{{ lastUpdate }}
+                    <div class="status-text" v-if="lastUpdate || !wsConnected">
+                        <span class="status-dot" :class="{ disconnected: !wsConnected }"></span>{{ wsConnected ? lastUpdate : '已断开，重连中...' }}
                     </div>
                     <button class="theme-toggle" @click="toggleTheme">
                         {{ themeLabel }}
@@ -891,6 +1049,9 @@
                     </button>
                 </div>
             </div>
+
+            <!-- 侧边栏遮罩 -->
+            <div class="sidebar-overlay" :class="{ visible: sidebarOpen }" @click="closeSidebar"></div>
 
             <!-- 侧边栏 -->
             <div class="modem-sidebar" :class="{ open: sidebarOpen }">
@@ -959,13 +1120,14 @@
                                     <div class="ussd-section">
                                         <div class="ussd-header">USSD 代码执行</div>
                                         <div class="ussd-input-group">
-                                            <input class="ussd-input" v-model="ussdCode" placeholder="如 *#100#"
-                                                :disabled="ussdLoading" />
-                                            <button class="ussd-btn" @click="runUSSD" :disabled="ussdLoading">
-                                                {{ ussdLoading ? '执行中...' : '发送' }}
+                                            <input class="ussd-input" v-model="getUssdState(modem.imei).code" placeholder="如 *#100#"
+                                                :disabled="getUssdState(modem.imei).loading" @input="validateUSSD(modem.imei)" />
+                                            <button class="ussd-btn" @click="runUSSD(modem)" :disabled="getUssdState(modem.imei).loading || getUssdState(modem.imei).error">
+                                                {{ getUssdState(modem.imei).loading ? '执行中...' : '发送' }}
                                             </button>
                                         </div>
-                                        <div class="ussd-result" v-if="ussdResult">{{ ussdResult }}</div>
+                                        <div v-if="getUssdState(modem.imei).error" class="ussd-error">{{ getUssdState(modem.imei).error }}</div>
+                                        <div class="ussd-result" v-if="getUssdState(modem.imei).result">{{ getUssdState(modem.imei).result }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -989,222 +1151,207 @@
                                 </button>
                             </div>
                             <div class="channel-list">
-                                <!-- Email -->
-                                <div class="channel-card">
+                                <div v-for="(ch, index) in channelsList" :key="index" class="channel-card">
                                     <div class="channel-header">
-                                        <span class="channel-type-badge">邮件推送 (Email)</span>
-                                        <label class="channel-enabled">
-                                            <input type="checkbox" v-model="channelsList[0].enabled" />
-                                            启用
-                                        </label>
-                                    </div>
-                                    <div class="channel-fields">
-                                        <div class="field-group">
-                                            <label class="field-label">SMTP 服务器</label>
-                                            <input class="field-input" v-model="channelsList[0].host"
-                                                placeholder="smtp.gmail.com" />
-                                        </div>
-                                        <div class="field-group">
-                                            <label class="field-label">端口</label>
-                                            <input type="number" class="field-input"
-                                                v-model.number="channelsList[0].port" placeholder="587" />
-                                        </div>
-                                        <div class="field-group">
+                                        <span class="channel-type-badge">{{ getChannelLabel(ch.type) }}</span>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
                                             <label class="channel-enabled">
-                                                <input type="checkbox" v-model="channelsList[0].use_tls" />
-                                                使用 TLS 加密
+                                                <input type="checkbox" v-model="ch.enabled" />
+                                                启用
                                             </label>
+                                            <button v-if="canRemoveChannel(ch.type)" class="remove-channel-btn"
+                                                @click="removeChannel(index)" title="删除此通道">×</button>
                                         </div>
-                                        <div class="field-group">
-                                            <label class="field-label">用户名</label>
-                                            <input class="field-input" v-model="channelsList[0].username"
-                                                placeholder="user@gmail.com" />
-                                        </div>
-                                        <div class="field-group">
-                                            <label class="field-label">密码</label>
-                                            <div style="position: relative;">
-                                                <input :type="showPasswords.email ? 'text' : 'password'"
-                                                    class="field-input" v-model="channelsList[0].password"
-                                                    placeholder="••••••" style="padding-right: 35px;" />
-                                                <span @click="showPasswords.email = !showPasswords.email"
-                                                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; width: 20px; height: 20px;">
-                                                    <svg v-if="showPasswords.email" xmlns="http://www.w3.org/2000/svg"
-                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                        style="width: 100%; height: 100%; opacity: 0.6;">
-                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                        <circle cx="12" cy="12" r="3"></circle>
-                                                    </svg>
-                                                    <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                        fill="none" stroke="currentColor" stroke-width="2"
-                                                        stroke-linecap="round" stroke-linejoin="round"
-                                                        style="width: 100%; height: 100%; opacity: 0.6;">
-                                                        <path
-                                                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
-                                                        </path>
-                                                        <line x1="1" y1="1" x2="23" y2="23"></line>
-                                                    </svg>
-                                                </span>
+                                    </div>
+                                    <div class="channel-fields">
+                                        <!-- Email fields -->
+                                        <template v-if="ch.type === 'email'">
+                                            <div class="field-group">
+                                                <label class="field-label">SMTP 服务器</label>
+                                                <input class="field-input" v-model="ch.host"
+                                                    placeholder="smtp.gmail.com" />
                                             </div>
-                                        </div>
-                                        <div class="field-group">
-                                            <label class="field-label">发件人</label>
-                                            <input class="field-input" v-model="channelsList[0].from"
-                                                placeholder="sender@gmail.com" />
-                                        </div>
-                                        <div class="field-group">
-                                            <label class="field-label">收件人 (多个用逗号分隔)</label>
-                                            <input class="field-input" :value="toStr(channelsList[0].to)"
-                                                @input="channelsList[0].to = fromStr($event.target.value)"
-                                                placeholder="a@gmail.com, b@gmail.com" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Bark -->
-                                <div class="channel-card">
-                                    <div class="channel-header">
-                                        <span class="channel-type-badge">Bark 推送</span>
-                                        <label class="channel-enabled">
-                                            <input type="checkbox" v-model="channelsList[1].enabled" />
-                                            启用
-                                        </label>
-                                    </div>
-                                    <div class="channel-fields">
-                                        <div class="field-group">
-                                            <label class="field-label">推送地址</label>
-                                            <input class="field-input" v-model="channelsList[1].endpoint"
-                                                placeholder="https://api.day.app/your_key" />
-                                        </div>
-                                        <div class="field-group">
-                                            <label class="field-label">标题 (可选)</label>
-                                            <input class="field-input" v-model="channelsList[1].title"
-                                                placeholder="SMS通知" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Gotify -->
-                                <div class="channel-card">
-                                    <div class="channel-header">
-                                        <span class="channel-type-badge">Gotify 推送</span>
-                                        <label class="channel-enabled">
-                                            <input type="checkbox" v-model="channelsList[2].enabled" />
-                                            启用
-                                        </label>
-                                    </div>
-                                    <div class="channel-fields">
-                                        <div class="field-group">
-                                            <label class="field-label">服务器地址</label>
-                                            <input class="field-input" v-model="channelsList[2].endpoint"
-                                                placeholder="https://gotify.example.com" />
-                                        </div>
-                                        <div class="field-group">
-                                            <label class="field-label">Token</label>
-                                            <div style="position: relative;">
-                                                <input :type="showPasswords.gotify ? 'text' : 'password'"
-                                                    class="field-input" v-model="channelsList[2].token"
-                                                    placeholder="应用令牌" style="padding-right: 35px;" />
-                                                <span @click="showPasswords.gotify = !showPasswords.gotify"
-                                                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; width: 20px; height: 20px;">
-                                                    <svg v-if="showPasswords.gotify" xmlns="http://www.w3.org/2000/svg"
-                                                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                        style="width: 100%; height: 100%; opacity: 0.6;">
-                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                        <circle cx="12" cy="12" r="3"></circle>
-                                                    </svg>
-                                                    <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                        fill="none" stroke="currentColor" stroke-width="2"
-                                                        stroke-linecap="round" stroke-linejoin="round"
-                                                        style="width: 100%; height: 100%; opacity: 0.6;">
-                                                        <path
-                                                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
-                                                        </path>
-                                                        <line x1="1" y1="1" x2="23" y2="23"></line>
-                                                    </svg>
-                                                </span>
+                                            <div class="field-group">
+                                                <label class="field-label">端口</label>
+                                                <input type="number" class="field-input"
+                                                    v-model.number="ch.port" placeholder="587" />
                                             </div>
-                                        </div>
-                                        <div class="field-group">
-                                            <label class="field-label">优先级 (0-10)</label>
-                                            <input type="number" class="field-input"
-                                                v-model.number="channelsList[2].priority" placeholder="5" min="0"
-                                                max="10" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- ServerChan -->
-                                <div class="channel-card">
-                                    <div class="channel-header">
-                                        <span class="channel-type-badge">Server酱3 推送</span>
-                                        <label class="channel-enabled">
-                                            <input type="checkbox" v-model="channelsList[3].enabled" />
-                                            启用
-                                        </label>
-                                    </div>
-                                    <div class="channel-fields">
-                                        <div class="field-group">
-                                            <label class="field-label">SendKey</label>
-                                            <div style="position: relative;">
-                                                <input :type="showPasswords.serverchan ? 'text' : 'password'"
-                                                    class="field-input" v-model="channelsList[3].send_key"
-                                                    placeholder="SCT..." style="padding-right: 35px;" />
-                                                <span @click="showPasswords.serverchan = !showPasswords.serverchan"
-                                                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; width: 20px; height: 20px;">
-                                                    <svg v-if="showPasswords.serverchan"
-                                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                        fill="none" stroke="currentColor" stroke-width="2"
-                                                        stroke-linecap="round" stroke-linejoin="round"
-                                                        style="width: 100%; height: 100%; opacity: 0.6;">
-                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                        <circle cx="12" cy="12" r="3"></circle>
-                                                    </svg>
-                                                    <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                                        fill="none" stroke="currentColor" stroke-width="2"
-                                                        stroke-linecap="round" stroke-linejoin="round"
-                                                        style="width: 100%; height: 100%; opacity: 0.6;">
-                                                        <path
-                                                            d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
-                                                        </path>
-                                                        <line x1="1" y1="1" x2="23" y2="23"></line>
-                                                    </svg>
-                                                </span>
+                                            <div class="field-group">
+                                                <label class="channel-enabled">
+                                                    <input type="checkbox" v-model="ch.use_tls" />
+                                                    使用 TLS 加密
+                                                </label>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                            <div class="field-group">
+                                                <label class="field-label">用户名</label>
+                                                <input class="field-input" v-model="ch.username"
+                                                    placeholder="user@gmail.com" />
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label">密码</label>
+                                                <div style="position: relative;">
+                                                    <input :type="ch._showPwd ? 'text' : 'password'"
+                                                        class="field-input" v-model="ch.password"
+                                                        placeholder="••••••" style="padding-right: 35px;" />
+                                                    <span @click="ch._showPwd = !ch._showPwd"
+                                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; width: 20px; height: 20px;">
+                                                        <svg v-if="ch._showPwd" xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                            style="width: 100%; height: 100%; opacity: 0.6;">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                        <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                            fill="none" stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            style="width: 100%; height: 100%; opacity: 0.6;">
+                                                            <path
+                                                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                                                            </path>
+                                                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label">发件人</label>
+                                                <input class="field-input" v-model="ch.from"
+                                                    placeholder="sender@gmail.com" />
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label">收件人 (多个用逗号分隔)</label>
+                                                <input class="field-input" :value="toStr(ch.to)"
+                                                    @input="ch.to = fromStr($event.target.value)"
+                                                    placeholder="a@gmail.com, b@gmail.com" />
+                                            </div>
+                                        </template>
 
-                                <!-- Webhook -->
-                                <div class="channel-card">
-                                    <div class="channel-header">
-                                        <span class="channel-type-badge">Webhook 推送</span>
-                                        <label class="channel-enabled">
-                                            <input type="checkbox" v-model="channelsList[4].enabled" />
-                                            启用
-                                        </label>
-                                    </div>
-                                    <div class="channel-fields">
-                                        <div class="field-group">
-                                            <label class="field-label">URL</label>
-                                            <input class="field-input" v-model="channelsList[4].url"
-                                                placeholder="https://example.com/webhook" />
-                                        </div>
-                                        <div class="field-group">
-                                            <label class="field-label">请求方法</label>
-                                            <select class="field-input" v-model="channelsList[4].method">
-                                                <option value="POST">POST</option>
-                                                <option value="GET">GET</option>
-                                            </select>
-                                        </div>
-                                        <div class="field-group">
-                                            <label class="field-label">请求头 (JSON)</label>
-                                            <textarea class="field-input" v-model="channelsList[4].headers_json"
-                                                rows="3" placeholder='{"Authorization": "Bearer token"}'></textarea>
-                                        </div>
+                                        <!-- Bark fields -->
+                                        <template v-if="ch.type === 'bark'">
+                                            <div class="field-group">
+                                                <label class="field-label">推送地址</label>
+                                                <input class="field-input" v-model="ch.endpoint"
+                                                    placeholder="https://api.day.app/your_key" />
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label">标题 (可选)</label>
+                                                <input class="field-input" v-model="ch.title"
+                                                    placeholder="SMS通知" />
+                                            </div>
+                                        </template>
+
+                                        <!-- Gotify fields -->
+                                        <template v-if="ch.type === 'gotify'">
+                                            <div class="field-group">
+                                                <label class="field-label">服务器地址</label>
+                                                <input class="field-input" v-model="ch.endpoint"
+                                                    placeholder="https://gotify.example.com" />
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label">Token</label>
+                                                <div style="position: relative;">
+                                                    <input :type="ch._showPwd ? 'text' : 'password'"
+                                                        class="field-input" v-model="ch.token"
+                                                        placeholder="应用令牌" style="padding-right: 35px;" />
+                                                    <span @click="ch._showPwd = !ch._showPwd"
+                                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; width: 20px; height: 20px;">
+                                                        <svg v-if="ch._showPwd" xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                            style="width: 100%; height: 100%; opacity: 0.6;">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                        <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                            fill="none" stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            style="width: 100%; height: 100%; opacity: 0.6;">
+                                                            <path
+                                                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                                                            </path>
+                                                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label">优先级 (0-10)</label>
+                                                <input type="number" class="field-input"
+                                                    v-model.number="ch.priority" placeholder="5" min="0"
+                                                    max="10" />
+                                            </div>
+                                        </template>
+
+                                        <!-- ServerChan fields -->
+                                        <template v-if="ch.type === 'serverchan'">
+                                            <div class="field-group">
+                                                <label class="field-label">SendKey</label>
+                                                <div style="position: relative;">
+                                                    <input :type="ch._showPwd ? 'text' : 'password'"
+                                                        class="field-input" v-model="ch.send_key"
+                                                        placeholder="SCT..." style="padding-right: 35px;" />
+                                                    <span @click="ch._showPwd = !ch._showPwd"
+                                                        style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; user-select: none; width: 20px; height: 20px;">
+                                                        <svg v-if="ch._showPwd"
+                                                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                            fill="none" stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            style="width: 100%; height: 100%; opacity: 0.6;">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                        <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                            fill="none" stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round"
+                                                            style="width: 100%; height: 100%; opacity: 0.6;">
+                                                            <path
+                                                                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                                                            </path>
+                                                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Webhook fields -->
+                                        <template v-if="ch.type === 'webhook'">
+                                            <div class="field-group">
+                                                <label class="field-label">URL</label>
+                                                <input class="field-input" v-model="ch.url"
+                                                    placeholder="https://example.com/webhook" />
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label">请求方法</label>
+                                                <select class="field-input" v-model="ch.method">
+                                                    <option value="POST">POST</option>
+                                                    <option value="GET">GET</option>
+                                                </select>
+                                            </div>
+                                            <div class="field-group">
+                                                <label class="field-label">请求头 (JSON)</label>
+                                                <textarea class="field-input" v-model="ch.headers_json"
+                                                    rows="3" placeholder='{"Authorization": "Bearer token"}'></textarea>
+                                            </div>
+                                        </template>
                                     </div>
                                 </div>
+                            </div>
+
+                            <!-- 添加通道按钮 -->
+                            <div style="margin-top: 8px; margin-bottom: 16px;">
+                                <select class="field-input" v-model="newChannelType" style="margin-bottom: 8px; width: 100%;">
+                                    <option value="" disabled>选择通道类型...</option>
+                                    <option value="email">Email 邮件推送</option>
+                                    <option value="bark">Bark 推送</option>
+                                    <option value="gotify">Gotify 推送</option>
+                                    <option value="serverchan">Server酱3 推送</option>
+                                    <option value="webhook">Webhook 推送</option>
+                                </select>
+                                <button class="add-channel-btn" @click="addChannel" :disabled="!newChannelType">
+                                    + 添加推送通道
+                                </button>
                             </div>
                             <button class="save-channels-btn" @click="saveChannels" :disabled="channelsSaving">
                                 {{ channelsSaving ? '保存中...' : '保存配置' }}
@@ -1260,7 +1407,7 @@
                         <!-- 加载更多 -->
                         <div v-if="hasMoreMessages && !searchQuery.trim()" style="text-align: center; padding: 20px;">
                             <button @click="loadMoreMessages" :disabled="loadingMore"
-                                style="padding: 10px 30px; background: transparent; border: 1px solid var(--border-secondary); color: var(--text-secondary); cursor: pointer; transition: all 0.2s;">
+                                style="padding: 10px 30px; background: transparent; border: 1px solid var(--border-secondary); color: var(--text-secondary); cursor: pointer; transition: all 0.2s; border-radius: 4px;">
                                 {{ loadingMore ? '加载中...' : '加载更多' }}
                             </button>
                         </div>
@@ -1282,6 +1429,14 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Toast 通知 -->
+            <div class="toast-container">
+                <div v-for="toast in toasts" :key="toast.id"
+                    class="toast" :class="[toast.type, toast.leaving ? 'toast-out' : '']">
+                    {{ toast.message }}
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1290,20 +1445,16 @@
 
         createApp({
             setup() {
+                // ── 核心状态 ──
                 const modems = ref([]);
                 const messages = ref([]);
                 const totalMessages = ref(0);
                 const messageOffset = ref(0);
                 const messageLimit = 50;
                 const hasMoreMessages = computed(() => messages.value.length < totalMessages.value);
+                const channelsList = ref([]);
 
-                const channelsList = ref([
-                    { type: 'email', enabled: false, port: 587, use_tls: true, to: [] },
-                    { type: 'bark', enabled: false },
-                    { type: 'gotify', enabled: false, priority: 5 },
-                    { type: 'serverchan', enabled: false },
-                    { type: 'webhook', enabled: false, method: 'POST' }
-                ]);
+                // ── UI 状态 ──
                 const modemsLoading = ref(true);
                 const messagesLoading = ref(true);
                 const loadingMore = ref(false);
@@ -1313,65 +1464,73 @@
                 const channelsError = ref(null);
                 const lastUpdate = ref('');
                 const sidebarOpen = ref(false);
-                const activeTab = ref('devices'); // 'devices' or 'channels'
-                const theme = ref('auto'); // 'light', 'dark', 'auto'
+                const activeTab = ref('devices');
+                const theme = ref('auto');
                 const searchQuery = ref('');
                 const showDeleteModal = ref(false);
                 const messageToDelete = ref(null);
                 const channelsSaving = ref(false);
                 const testingChannels = ref(false);
-                const showPasswords = ref({
-                    email: false,
-                    gotify: false,
-                    serverchan: false
-                });
+                const wsConnected = ref(false);
+                const newChannelType = ref('');
 
-                // USSD
-                const ussdCode = ref('*#100#');
-                const ussdResult = ref('');
-                const ussdLoading = ref(false);
-                const selectedModem = ref('');
+                // ── USSD（按 IMEI 独立管理每台设备的状态）──
+                const ussdStates = ref({});
+                const getUssdState = (imei) => {
+                    if (!ussdStates.value[imei]) {
+                        ussdStates.value[imei] = { code: '*#100#', result: '', loading: false, error: '' };
+                    }
+                    return ussdStates.value[imei];
+                };
+
+                // ── Toast 通知 ──
+                const toasts = ref([]);
+                let toastId = 0;
+                const showToast = (message, type = 'info', duration = 3000) => {
+                    const id = ++toastId;
+                    toasts.value.push({ id, message, type, leaving: false });
+                    setTimeout(() => {
+                        const t = toasts.value.find(t => t.id === id);
+                        if (t) t.leaving = true;
+                        setTimeout(() => {
+                            toasts.value = toasts.value.filter(t => t.id !== id);
+                        }, 300);
+                    }, duration);
+                };
 
                 let refreshTimer = null;
                 let ws = null;
                 let reconnectTimer = null;
 
-                // 字符串数组互转
+                // ── 工具函数 ──
                 const toStr = (arr) => Array.isArray(arr) ? arr.join(', ') : '';
                 const fromStr = (str) => str.split(',').map(s => s.trim()).filter(s => s);
 
-                // 过滤后的消息列表
                 const filteredMessages = computed(() => {
-                    if (!searchQuery.value.trim()) {
-                        return messages.value;
-                    }
+                    if (!searchQuery.value.trim()) return messages.value;
                     const query = searchQuery.value.toLowerCase();
-                    return messages.value.filter(msg => {
-                        return (msg.text && msg.text.toLowerCase().includes(query)) ||
-                            (msg.number && msg.number.includes(query)) ||
-                            (msg.modem && msg.modem.toLowerCase().includes(query));
-                    });
+                    return messages.value.filter(msg =>
+                        (msg.text && msg.text.toLowerCase().includes(query)) ||
+                        (msg.number && msg.number.includes(query)) ||
+                        (msg.modem && msg.modem.toLowerCase().includes(query))
+                    );
                 });
 
-                // 主题标签
                 const themeLabel = computed(() => {
                     const labels = { light: '浅色', dark: '深色', auto: '跟随系统' };
                     return labels[theme.value];
                 });
 
-                // 初始化主题
+                // ── 主题 ──
                 const initTheme = () => {
-                    const savedTheme = localStorage.getItem('theme') || 'dark';
-                    theme.value = savedTheme;
-                    applyTheme(savedTheme);
+                    const saved = localStorage.getItem('theme') || 'dark';
+                    theme.value = saved;
+                    applyTheme(saved);
                 };
 
-                // 应用主题
                 const applyTheme = (themeName) => {
                     const root = document.documentElement;
-
                     if (themeName === 'auto') {
-                        // 检测系统主题偏好
                         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                         root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
                     } else {
@@ -1379,108 +1538,146 @@
                     }
                 };
 
-                // 切换主题
                 const toggleTheme = () => {
                     const themes = ['dark', 'light', 'auto'];
-                    const currentIndex = themes.indexOf(theme.value);
-                    const nextIndex = (currentIndex + 1) % themes.length;
-                    theme.value = themes[nextIndex];
-
+                    const idx = (themes.indexOf(theme.value) + 1) % themes.length;
+                    theme.value = themes[idx];
                     localStorage.setItem('theme', theme.value);
                     applyTheme(theme.value);
                 };
 
-                // 监听系统主题变化
                 const watchSystemTheme = () => {
-                    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-                    mediaQuery.addEventListener('change', (e) => {
-                        if (theme.value === 'auto') {
-                            applyTheme('auto');
-                        }
+                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                        if (theme.value === 'auto') applyTheme('auto');
                     });
                 };
 
+                // ── 格式化 ──
                 const formatTime = (timestamp) => {
                     if (!timestamp) return '未知';
                     const date = new Date(timestamp);
-                    const now = new Date();
-                    const diff = now - date;
-
-                    // 1分钟内
+                    const diff = Date.now() - date.getTime();
                     if (diff < 60000) return '刚刚';
-                    // 1小时内
                     if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前';
-                    // 24小时内
                     if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
-                    // 7天内
                     if (diff < 604800000) return Math.floor(diff / 86400000) + ' 天前';
-
-                    // 超过7天显示完整日期
                     return date.toLocaleString('zh-CN', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit'
+                        year: 'numeric', month: '2-digit', day: '2-digit',
+                        hour: '2-digit', minute: '2-digit'
                     });
                 };
 
-                const getSignalClass = (quality) => {
-                    if (quality >= 80) return 'signal-excellent';
-                    if (quality >= 60) return 'signal-good';
-                    if (quality >= 40) return 'signal-fair';
-                    if (quality > 0) return 'signal-poor';
+                const getSignalClass = (q) => {
+                    if (q >= 80) return 'signal-excellent';
+                    if (q >= 60) return 'signal-good';
+                    if (q >= 40) return 'signal-fair';
+                    if (q > 0) return 'signal-poor';
                     return 'signal-none';
                 };
 
-                const getSignalColor = (quality) => {
-                    if (quality >= 80) return 'var(--signal-excellent)';
-                    if (quality >= 60) return 'var(--signal-good)';
-                    if (quality >= 40) return 'var(--signal-fair)';
-                    if (quality > 0) return 'var(--signal-poor)';
+                const getSignalColor = (q) => {
+                    if (q >= 80) return 'var(--signal-excellent)';
+                    if (q >= 60) return 'var(--signal-good)';
+                    if (q >= 40) return 'var(--signal-fair)';
+                    if (q > 0) return 'var(--signal-poor)';
                     return 'var(--signal-none)';
                 };
 
-                // 获取通道类型的显示名称
-                const getChannelTypeName = (type) => {
-                    const typeNames = {
-                        'email': 'Email',
-                        'bark': 'Bark',
-                        'gotify': 'Gotify',
-                        'serverchan': 'Server酱3',
-                        'webhook': 'Webhook'
-                    };
-                    return typeNames[type] || type || '未知';
+                // ── 通道管理 ──
+                const channelLabels = {
+                    email: '邮件推送 (Email)',
+                    bark: 'Bark 推送',
+                    gotify: 'Gotify 推送',
+                    serverchan: 'Server酱3 推送',
+                    webhook: 'Webhook 推送'
                 };
 
-                // 侧边栏控制
+                const getChannelLabel = (type) => channelLabels[type] || type || '未知';
+
+                const channelDefaults = {
+                    email: { type: 'email', enabled: false, port: 587, use_tls: true, to: [], _showPwd: false },
+                    bark: { type: 'bark', enabled: false, _showPwd: false },
+                    gotify: { type: 'gotify', enabled: false, priority: 5, _showPwd: false },
+                    serverchan: { type: 'serverchan', enabled: false, _showPwd: false },
+                    webhook: { type: 'webhook', enabled: false, method: 'POST', headers_json: '', _showPwd: false }
+                };
+
+                const addChannel = () => {
+                    const type = newChannelType.value;
+                    if (!type || !channelDefaults[type]) return;
+                    // 深拷贝以避免多个同类型通道共享引用（如 email 的 to 数组）
+                    channelsList.value.push(JSON.parse(JSON.stringify(channelDefaults[type])));
+                    newChannelType.value = '';
+                    showToast(`已添加 ${getChannelLabel(type)} 通道`, 'success');
+                };
+
+                const removeChannel = (index) => {
+                    const ch = channelsList.value[index];
+                    channelsList.value.splice(index, 1);
+                    showToast(`已移除 ${getChannelLabel(ch.type)} 通道`, 'info');
+                };
+
+                // 判断是否可以删除该通道（同类型有多个时才允许删除）
+                const canRemoveChannel = (type) => {
+                    return channelsList.value.filter(c => c.type === type).length > 1;
+                };
+
+                // 清洗通道数据，去掉前端内部字段
+                const cleanChannelsForSave = () => {
+                    return channelsList.value.map(ch => {
+                        const copy = { ...ch };
+                        delete copy._showPwd;
+                        if (copy.type === 'webhook') {
+                            try {
+                                copy.headers = copy.headers_json ? JSON.parse(copy.headers_json) : {};
+                            } catch (e) {
+                                copy.headers = {};
+                            }
+                            delete copy.headers_json;
+                        }
+                        return copy;
+                    });
+                };
+
+                // ── USSD 验证 ──
+                const validateUSSD = (imei) => {
+                    const state = getUssdState(imei);
+                    const code = state.code;
+                    if (!code) {
+                        state.error = '';
+                        return;
+                    }
+                    for (const c of code) {
+                        if (c !== '*' && c !== '#' && (c < '0' || c > '9')) {
+                            state.error = '仅允许数字、* 和 # 字符';
+                            return;
+                        }
+                    }
+                    state.error = '';
+                };
+
+                // ── 侧边栏 ──
                 const toggleSidebar = () => {
                     sidebarOpen.value = !sidebarOpen.value;
                 };
-
                 const closeSidebar = () => {
                     sidebarOpen.value = false;
                 };
-
                 const switchToChannels = () => {
                     activeTab.value = 'channels';
-                    if (!channelsLoading.value) {
-                        loadChannels();
-                    }
+                    if (!channelsLoading.value) loadChannels();
                 };
 
+                // ── API 请求 ──
                 const loadModems = async () => {
                     try {
                         modemsError.value = null;
-                        const response = await fetch('/api/modems');
-                        if (!response.ok) throw new Error('加载失败');
-                        modems.value = await response.json();
-                        if (modems.value.length > 0 && !selectedModem.value) {
-                            selectedModem.value = modems.value[0].imei;
-                        }
+                        const res = await fetch('/api/modems');
+                        if (!res.ok) throw new Error('加载失败');
+                        modems.value = await res.json();
                         updateLastUpdateTime();
-                    } catch (error) {
-                        modemsError.value = '加载设备信息失败: ' + error.message;
+                    } catch (e) {
+                        modemsError.value = '加载设备信息失败: ' + e.message;
                     } finally {
                         modemsLoading.value = false;
                     }
@@ -1495,41 +1692,33 @@
                             messageOffset.value = 0;
                             messagesError.value = null;
                         }
-
                         const offset = append ? messageOffset.value : 0;
-                        const response = await fetch(`/api/messages?limit=${messageLimit}&offset=${offset}`);
-                        if (!response.ok) throw new Error('加载失败');
+                        const res = await fetch(`/api/messages?limit=${messageLimit}&offset=${offset}`);
+                        if (!res.ok) throw new Error('加载失败');
+                        const data = await res.json();
 
-                        const data = await response.json();
-                        // 兼容旧 API (返回数组) 和新 API (返回对象 {items, total})
-                        let newMessages = [];
+                        let newMsgs = [];
                         let total = 0;
-
                         if (Array.isArray(data)) {
-                            newMessages = data;
-                            total = data.length; // 旧 API 没有总数，假设只有这些
+                            newMsgs = data;
+                            total = data.length;
                         } else {
-                            newMessages = data.items || [];
+                            newMsgs = data.items || [];
                             total = data.total || 0;
                         }
 
-                        // 排序：最新的在前 (backend 已经按倒序返回，但为了保险可以再排一次，或者直接信任后端)
-                        // 这里假设后端已经倒序，直接使用
-
                         if (append) {
-                            messages.value = [...messages.value, ...newMessages];
+                            messages.value = [...messages.value, ...newMsgs];
                         } else {
-                            messages.value = newMessages;
+                            messages.value = newMsgs;
                         }
-
                         totalMessages.value = total;
-                        messageOffset.value += newMessages.length;
-
-                    } catch (error) {
+                        messageOffset.value += newMsgs.length;
+                    } catch (e) {
                         if (!append) {
-                            messagesError.value = '加载短信失败: ' + error.message;
+                            messagesError.value = '加载短信失败: ' + e.message;
                         } else {
-                            alert('加载更多失败: ' + error.message);
+                            showToast('加载更多失败: ' + e.message, 'error');
                         }
                     } finally {
                         messagesLoading.value = false;
@@ -1546,29 +1735,25 @@
                     try {
                         channelsLoading.value = true;
                         channelsError.value = null;
-                        const response = await fetch('/api/channels');
-                        if (!response.ok) throw new Error('加载失败');
-                        const data = await response.json();
+                        const res = await fetch('/api/channels');
+                        if (!res.ok) throw new Error('加载失败');
+                        const data = await res.json();
 
-                        console.log('从服务器加载的通道配置:', data);
-
-                        // 完全替换本地模板，确保所有字段都被正确覆盖
                         if (Array.isArray(data) && data.length > 0) {
-                            data.forEach(ch => {
-                                const idx = channelsList.value.findIndex(c => c.type === ch.type);
-                                if (idx !== -1) {
-                                    // 确保 to 字段正确处理
-                                    if (ch.type === 'email' && !Array.isArray(ch.to)) {
-                                        ch.to = [];
-                                    }
-                                    channelsList.value[idx] = { ...ch };
-                                    console.log(`已合并通道: ${ch.type}`, channelsList.value[idx]);
+                            // 后端返回完整通道列表（含多个同类型），直接使用
+                            channelsList.value = data.map(ch => {
+                                if (ch.type === 'email' && !Array.isArray(ch.to)) {
+                                    ch.to = [];
                                 }
+                                if (ch.type === 'webhook') {
+                                    ch.headers_json = ch.headers ? JSON.stringify(ch.headers, null, 2) : '';
+                                }
+                                ch._showPwd = false;
+                                return ch;
                             });
                         }
-                    } catch (error) {
-                        channelsError.value = '加载通道配置失败: ' + error.message;
-                        console.error('加载通道失败:', error);
+                    } catch (e) {
+                        channelsError.value = '加载通道配置失败: ' + e.message;
                     } finally {
                         channelsLoading.value = false;
                     }
@@ -1577,162 +1762,126 @@
                 const saveChannels = async () => {
                     try {
                         channelsSaving.value = true;
-                        const response = await fetch('/api/channels/save', {
+                        const res = await fetch('/api/channels/save', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(channelsList.value)
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(cleanChannelsForSave())
                         });
-
-                        if (!response.ok) {
-                            const error = await response.text();
-                            throw new Error(error || '保存失败');
+                        if (!res.ok) {
+                            const text = await res.text();
+                            throw new Error(text || '保存失败');
                         }
-
-                        alert('配置已保存成功！');
-                    } catch (error) {
-                        alert('保存失败: ' + error.message);
+                        showToast('配置已保存成功', 'success');
+                    } catch (e) {
+                        showToast('保存失败: ' + e.message, 'error', 5000);
                     } finally {
                         channelsSaving.value = false;
                     }
                 };
 
                 const testAllChannels = async () => {
-                    const enabledChannels = channelsList.value.filter(ch => ch.enabled);
-                    if (enabledChannels.length === 0) {
-                        alert('❌ 没有启用的推送通道，请先启用至少一个通道');
+                    const enabled = cleanChannelsForSave().filter(ch => ch.enabled);
+                    if (enabled.length === 0) {
+                        showToast('没有启用的推送通道，请先启用至少一个通道', 'warning');
                         return;
                     }
-
                     try {
                         testingChannels.value = true;
-
-                        const response = await fetch('/api/channels/test', {
+                        const res = await fetch('/api/channels/test', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify(enabledChannels)
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(enabled)
                         });
-
-                        if (!response.ok) {
-                            const error = await response.text();
-                            throw new Error(error || '测试失败');
+                        if (!res.ok) {
+                            const text = await res.text();
+                            throw new Error(text || '测试失败');
                         }
-
-                        const result = await response.json();
+                        const result = await res.json();
                         if (result.success) {
-                            alert(`✅ 测试推送已发送到 ${enabledChannels.length} 个通道！请检查是否收到通知。`);
+                            showToast(`测试推送已发送到 ${enabled.length} 个通道，请检查是否收到通知`, 'success', 5000);
                         } else {
-                            alert('❌ 测试失败: ' + (result.error || '未知错误'));
+                            showToast('测试失败: ' + (result.error || '未知错误'), 'error', 5000);
                         }
-                    } catch (error) {
-                        alert('❌ 测试失败: ' + error.message);
+                    } catch (e) {
+                        showToast('测试失败: ' + e.message, 'error', 5000);
                     } finally {
                         testingChannels.value = false;
                     }
                 };
 
-                const runUSSD = async () => {
-                    if (!selectedModem.value || !ussdCode.value) {
-                        alert('请选择设备并输入 USSD 代码');
+                const runUSSD = async (modem) => {
+                    if (!modem || !modem.imei) return;
+                    const state = getUssdState(modem.imei);
+                    if (!state.code) {
+                        showToast('请输入 USSD 代码', 'warning');
                         return;
                     }
+                    if (state.error) return;
 
                     try {
-                        ussdLoading.value = true;
-                        ussdResult.value = '';
-
-                        const response = await fetch('/api/ussd', {
+                        state.loading = true;
+                        state.result = '';
+                        const res = await fetch('/api/ussd', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                imei: selectedModem.value,
-                                code: ussdCode.value
-                            })
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ imei: modem.imei, code: state.code })
                         });
-
-                        const data = await response.json();
-                        if (!response.ok) {
-                            throw new Error(data.error || '执行失败');
-                        }
-
-                        ussdResult.value = data.reply || 'USSD 请求已发送，但未收到即时回复（请留意短信通知）。';
-                    } catch (error) {
-                        alert('USSD 执行失败: ' + error.message);
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.error || '执行失败');
+                        state.result = data.reply || 'USSD 请求已发送，但未收到即时回复（请留意短信通知）。';
+                    } catch (e) {
+                        showToast('USSD 执行失败: ' + e.message, 'error');
                     } finally {
-                        ussdLoading.value = false;
+                        state.loading = false;
                     }
                 };
 
                 const updateLastUpdateTime = () => {
-                    const now = new Date();
-                    lastUpdate.value = '更新于 ' + now.toLocaleTimeString('zh-CN', {
-                        hour: '2-digit',
-                        minute: '2-digit'
+                    lastUpdate.value = '更新于 ' + new Date().toLocaleTimeString('zh-CN', {
+                        hour: '2-digit', minute: '2-digit'
                     });
                 };
 
-                const refresh = () => {
-                    loadModems();
-                    // 不自动刷新消息列表，以免干扰翻页（或者只刷新第一页）
-                    // 选择：如果我们在第一页，可以尝试刷新最新的
-                    if (messageOffset.value <= messageLimit) {
-                        // 简单的做法：这里只刷新 modem，消息刷新由 websocket 或手动触发
-                    }
-                };
+                const refresh = () => { loadModems(); };
 
-                // 确认删除
+                // ── 删除 ──
                 const confirmDelete = (msg) => {
                     messageToDelete.value = msg;
                     showDeleteModal.value = true;
                 };
-
-                // 取消删除
                 const cancelDelete = () => {
                     showDeleteModal.value = false;
                     messageToDelete.value = null;
                 };
-
-                // 删除短信
                 const deleteMessage = async () => {
                     if (!messageToDelete.value) return;
-
                     try {
-                        const response = await fetch('/api/messages/delete', {
+                        const res = await fetch('/api/messages/delete', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ id: messageToDelete.value.id })
                         });
-
-                        if (!response.ok) {
-                            const error = await response.text();
-                            throw new Error(error || '删除失败');
+                        if (!res.ok) {
+                            const text = await res.text();
+                            throw new Error(text || '删除失败');
                         }
-
-                        // 从列表中移除
                         messages.value = messages.value.filter(m => m.id !== messageToDelete.value.id);
-
-                        // 关闭对话框
+                        totalMessages.value = Math.max(0, totalMessages.value - 1);
                         cancelDelete();
-                    } catch (error) {
-                        alert('删除失败: ' + error.message);
+                        showToast('短信已删除', 'success');
+                    } catch (e) {
+                        showToast('删除失败: ' + e.message, 'error');
                     }
                 };
 
-                // WebSocket 连接
+                // ── WebSocket ──
                 const connectWebSocket = () => {
                     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
                     const wsUrl = `${protocol}//${window.location.host}/ws`;
-
                     ws = new WebSocket(wsUrl);
 
                     ws.onopen = () => {
+                        wsConnected.value = true;
                         console.log('WebSocket 已连接');
                     };
 
@@ -1740,92 +1889,64 @@
                         try {
                             const data = JSON.parse(event.data);
                             if (data.type === 'new_message') {
-                                // 将新消息插入到列表顶部
                                 messages.value.unshift(data.message);
                                 totalMessages.value++;
-                                messageOffset.value++; // 偏移量增加
+                                messageOffset.value++;
                                 updateLastUpdateTime();
                             }
-                        } catch (error) {
-                            console.error('处理 WebSocket 消息失败:', error);
+                        } catch (e) {
+                            console.error('处理 WebSocket 消息失败:', e);
                         }
                     };
 
-                    ws.onerror = (error) => {
-                        console.error('WebSocket 错误:', error);
+                    ws.onerror = () => {
+                        wsConnected.value = false;
                     };
 
                     ws.onclose = () => {
+                        wsConnected.value = false;
                         console.log('WebSocket 已断开，5秒后重连...');
                         reconnectTimer = setTimeout(connectWebSocket, 5000);
                     };
                 };
 
+                // ── 生命周期 ──
                 onMounted(() => {
                     initTheme();
                     watchSystemTheme();
                     loadModems();
-                    loadMessages(); // 初始加载
+                    loadMessages();
                     connectWebSocket();
                     refreshTimer = setInterval(refresh, 30000);
                 });
 
                 onUnmounted(() => {
-                    if (refreshTimer) {
-                        clearInterval(refreshTimer);
-                    }
-                    if (reconnectTimer) {
-                        clearTimeout(reconnectTimer);
-                    }
+                    if (refreshTimer) clearInterval(refreshTimer);
+                    if (reconnectTimer) clearTimeout(reconnectTimer);
                     if (ws) {
+                        ws.onclose = null; // 防止 close 触发重连
                         ws.close();
+                        ws = null;
                     }
                 });
 
                 return {
-                    modems,
-                    messages,
-                    channelsList,
-                    modemsLoading,
-                    messagesLoading,
-                    loadingMore,
-                    hasMoreMessages,
-                    channelsLoading,
-                    modemsError,
-                    messagesError,
-                    channelsError,
-                    lastUpdate,
-                    sidebarOpen,
-                    activeTab,
-                    theme,
-                    themeLabel,
-                    searchQuery,
-                    filteredMessages,
-                    showDeleteModal,
-                    messageToDelete,
-                    channelsSaving,
-                    testingChannels,
-                    showPasswords,
-                    ussdCode,
-                    ussdResult,
-                    ussdLoading,
-                    selectedModem,
-                    formatTime,
-                    getSignalClass,
-                    getSignalColor,
-                    toStr,
-                    fromStr,
-                    toggleSidebar,
-                    closeSidebar,
-                    switchToChannels,
-                    toggleTheme,
-                    confirmDelete,
-                    cancelDelete,
-                    deleteMessage,
-                    saveChannels,
-                    testAllChannels,
-                    runUSSD,
-                    loadMoreMessages
+                    modems, messages, channelsList,
+                    modemsLoading, messagesLoading, loadingMore, hasMoreMessages,
+                    channelsLoading, modemsError, messagesError, channelsError,
+                    lastUpdate, sidebarOpen, activeTab, theme, themeLabel,
+                    searchQuery, filteredMessages,
+                    showDeleteModal, messageToDelete,
+                    channelsSaving, testingChannels,
+                    wsConnected, newChannelType, toasts,
+                    ussdStates, getUssdState,
+                    formatTime, getSignalClass, getSignalColor,
+                    toStr, fromStr,
+                    getChannelLabel, addChannel, removeChannel, canRemoveChannel,
+                    validateUSSD, showToast,
+                    toggleSidebar, closeSidebar, switchToChannels, toggleTheme,
+                    confirmDelete, cancelDelete, deleteMessage,
+                    saveChannels, testAllChannels, runUSSD, loadMoreMessages
                 };
             }
         }).mount('#app');

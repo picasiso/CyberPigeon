@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/BurntSushi/toml"
 )
@@ -77,13 +78,75 @@ func Load(path string) (*Config, error) {
 	return &cfg, nil
 }
 
-// Save 保存配置到文件
-func (c *Config) Save(path string) error {
-	f, err := os.Create(path)
-	if err != nil {
-		return fmt.Errorf("创建配置文件: %w", err)
+// channelToMap 将通道配置转换为 map，只包含该类型通道的相关字段
+func channelToMap(ch ChannelConfig) map[string]any {
+	m := map[string]any{
+		"type":    ch.Type,
+		"enabled": ch.Enabled,
 	}
-	defer f.Close()
+	if ch.RequestTimeoutSec > 0 {
+		m["request_timeout_sec"] = ch.RequestTimeoutSec
+	}
+
+	switch ch.Type {
+	case "email":
+		m["host"] = ch.Host
+		m["port"] = ch.Port
+		m["username"] = ch.Username
+		m["password"] = ch.Password
+		m["from"] = ch.From
+		m["to"] = ch.To
+		if ch.UseTLS {
+			m["use_tls"] = ch.UseTLS
+		}
+	case "bark":
+		m["endpoint"] = ch.Endpoint
+		if ch.Title != "" {
+			m["title"] = ch.Title
+		}
+	case "gotify":
+		m["endpoint"] = ch.Endpoint
+		m["token"] = ch.Token
+		if ch.Priority != 0 {
+			m["priority"] = ch.Priority
+		}
+	case "serverchan":
+		m["send_key"] = ch.SendKey
+	case "webhook":
+		m["url"] = ch.URL
+		m["method"] = ch.Method
+		if ch.AllowPrivateNetwork {
+			m["allow_private_network"] = ch.AllowPrivateNetwork
+		}
+		if len(ch.Headers) > 0 {
+			m["headers"] = ch.Headers
+		}
+	default:
+		// 未知类型：序列化所有非零字段
+		m["host"] = ch.Host
+		m["port"] = ch.Port
+		m["username"] = ch.Username
+		m["password"] = ch.Password
+		m["from"] = ch.From
+		m["to"] = ch.To
+		m["endpoint"] = ch.Endpoint
+		m["token"] = ch.Token
+		m["send_key"] = ch.SendKey
+		m["url"] = ch.URL
+		m["method"] = ch.Method
+	}
+	return m
+}
+
+// Save 保存配置到文件（原子写入：先写临时文件，再重命名）
+func (c *Config) Save(path string) error {
+	// 在目标文件同目录创建临时文件，确保同一文件系统以支持原子 Rename
+	dir := filepath.Dir(path)
+	tmpFile, err := os.CreateTemp(dir, ".config-*.toml.tmp")
+	if err != nil {
+		return fmt.Errorf("创建临时文件: %w", err)
+	}
+	tmpPath := tmpFile.Name()
 
 	// 构建用于保存的配置，过滤掉每个通道不相关的字段
 	saveConfig := struct {
@@ -97,100 +160,24 @@ func (c *Config) Save(path string) error {
 	}
 
 	for _, ch := range c.Channels {
-		switch ch.Type {
-		case "email":
-			saveConfig.Channels = append(saveConfig.Channels, struct {
-				Type              string   `toml:"type"`
-				Enabled           bool     `toml:"enabled"`
-				RequestTimeoutSec int      `toml:"request_timeout_sec,omitempty"`
-				Host              string   `toml:"host"`
-				Port              int      `toml:"port"`
-				Username          string   `toml:"username"`
-				Password          string   `toml:"password"`
-				From              string   `toml:"from"`
-				To                []string `toml:"to"`
-				UseTLS            bool     `toml:"use_tls,omitempty"`
-			}{
-				Type:              ch.Type,
-				Enabled:           ch.Enabled,
-				RequestTimeoutSec: ch.RequestTimeoutSec,
-				Host:              ch.Host,
-				Port:              ch.Port,
-				Username:          ch.Username,
-				Password:          ch.Password,
-				From:              ch.From,
-				To:                ch.To,
-				UseTLS:            ch.UseTLS,
-			})
-		case "bark":
-			saveConfig.Channels = append(saveConfig.Channels, struct {
-				Type              string `toml:"type"`
-				Enabled           bool   `toml:"enabled"`
-				RequestTimeoutSec int    `toml:"request_timeout_sec,omitempty"`
-				Endpoint          string `toml:"endpoint"`
-				Title             string `toml:"title,omitempty"`
-			}{
-				Type:              ch.Type,
-				Enabled:           ch.Enabled,
-				RequestTimeoutSec: ch.RequestTimeoutSec,
-				Endpoint:          ch.Endpoint,
-				Title:             ch.Title,
-			})
-		case "gotify":
-			saveConfig.Channels = append(saveConfig.Channels, struct {
-				Type              string `toml:"type"`
-				Enabled           bool   `toml:"enabled"`
-				RequestTimeoutSec int    `toml:"request_timeout_sec,omitempty"`
-				Endpoint          string `toml:"endpoint"`
-				Token             string `toml:"token"`
-				Priority          int    `toml:"priority,omitempty"`
-			}{
-				Type:              ch.Type,
-				Enabled:           ch.Enabled,
-				RequestTimeoutSec: ch.RequestTimeoutSec,
-				Endpoint:          ch.Endpoint,
-				Token:             ch.Token,
-				Priority:          ch.Priority,
-			})
-		case "serverchan":
-			saveConfig.Channels = append(saveConfig.Channels, struct {
-				Type              string `toml:"type"`
-				Enabled           bool   `toml:"enabled"`
-				RequestTimeoutSec int    `toml:"request_timeout_sec,omitempty"`
-				SendKey           string `toml:"send_key"`
-			}{
-				Type:              ch.Type,
-				Enabled:           ch.Enabled,
-				RequestTimeoutSec: ch.RequestTimeoutSec,
-				SendKey:           ch.SendKey,
-			})
-		case "webhook":
-			saveConfig.Channels = append(saveConfig.Channels, struct {
-				Type                string            `toml:"type"`
-				Enabled             bool              `toml:"enabled"`
-				RequestTimeoutSec   int               `toml:"request_timeout_sec,omitempty"`
-				AllowPrivateNetwork bool              `toml:"allow_private_network,omitempty"`
-				URL                 string            `toml:"url"`
-				Method              string            `toml:"method"`
-				Headers             map[string]string `toml:"headers,omitempty"`
-			}{
-				Type:                ch.Type,
-				Enabled:             ch.Enabled,
-				RequestTimeoutSec:   ch.RequestTimeoutSec,
-				AllowPrivateNetwork: ch.AllowPrivateNetwork,
-				URL:                 ch.URL,
-				Method:              ch.Method,
-				Headers:             ch.Headers,
-			})
-		default:
-			// 未知类型，保存所有字段
-			saveConfig.Channels = append(saveConfig.Channels, ch)
-		}
+		saveConfig.Channels = append(saveConfig.Channels, channelToMap(ch))
 	}
 
-	encoder := toml.NewEncoder(f)
+	encoder := toml.NewEncoder(tmpFile)
 	if err := encoder.Encode(saveConfig); err != nil {
+		tmpFile.Close()
+		os.Remove(tmpPath)
 		return fmt.Errorf("编码配置文件: %w", err)
+	}
+
+	if err := tmpFile.Close(); err != nil {
+		os.Remove(tmpPath)
+		return fmt.Errorf("关闭临时文件: %w", err)
+	}
+
+	if err := os.Rename(tmpPath, path); err != nil {
+		os.Remove(tmpPath)
+		return fmt.Errorf("重命名配置文件: %w", err)
 	}
 
 	return nil

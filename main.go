@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/sms-forwarder/internal/config"
@@ -31,6 +32,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("初始化 ModemManager 失败: %v", err)
 	}
+	defer manager.Close()
 
 	// 初始化存储
 	var store *storage.Storage
@@ -62,15 +64,21 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
+	var wg sync.WaitGroup
+
 	// 启动转发器
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		if err := fwd.Run(ctx); err != nil {
 			slog.Error("转发器运行错误", "error", err)
 		}
 	}()
 
 	// 启动 Web 服务器
+	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		if err := srv.Run(ctx); err != nil {
 			slog.Error("服务器运行错误", "error", err)
 		}
@@ -85,4 +93,5 @@ func main() {
 
 	slog.Info("收到停止信号，正在关闭...")
 	cancel()
+	wg.Wait() // 等待所有协程优雅退出
 }

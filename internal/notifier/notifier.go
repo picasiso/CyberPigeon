@@ -3,6 +3,7 @@ package notifier
 import (
 	"fmt"
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/sms-forwarder/internal/config"
@@ -70,22 +71,37 @@ func New(cfg *config.Config) (*Notifier, error) {
 	}, nil
 }
 
-// Send 发送通知
+// Send 并发发送通知到所有通道
 func (n *Notifier) Send(msg Message) error {
 	if len(n.channels) == 0 {
 		return nil
 	}
 
-	var lastErr error
-	for _, ch := range n.channels {
-		if err := ch.Send(msg); err != nil {
-			slog.Error("通道发送失败", "type", ch.Type(), "error", err)
-			lastErr = err
-			continue
-		}
-		slog.Info("通知已发送", "type", ch.Type())
+	var wg sync.WaitGroup
+	errs := make([]error, len(n.channels))
+
+	for i, ch := range n.channels {
+		wg.Add(1)
+		go func(idx int, c Channel) {
+			defer wg.Done()
+			if err := c.Send(msg); err != nil {
+				slog.Error("通道发送失败", "type", c.Type(), "error", err)
+				errs[idx] = err
+			} else {
+				slog.Info("通知已发送", "type", c.Type())
+			}
+		}(i, ch)
 	}
 
+	wg.Wait()
+
+	// 返回最后一个错误
+	var lastErr error
+	for _, err := range errs {
+		if err != nil {
+			lastErr = err
+		}
+	}
 	return lastErr
 }
 

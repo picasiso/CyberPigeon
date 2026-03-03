@@ -34,6 +34,7 @@ type Server struct {
 	configPath string
 	clients    map[*websocket.Conn]bool
 	clientsMu  sync.RWMutex
+	writeMu    sync.Mutex // 保护 WebSocket 并发写
 	upgrader   websocket.Upgrader
 }
 
@@ -263,6 +264,18 @@ func (s *Server) handleUSSD(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 校验 USSD 代码格式（通常以 * 或 # 开头，以 # 结尾，只包含数字、*、#）
+	if req.Code == "" {
+		sendError(w, "USSD code is empty", http.StatusBadRequest)
+		return
+	}
+	for _, c := range req.Code {
+		if c != '*' && c != '#' && (c < '0' || c > '9') {
+			sendError(w, "Invalid USSD code format, only digits, * and # are allowed", http.StatusBadRequest)
+			return
+		}
+	}
+
 	modems := s.forwarder.GetModems()
 	var targetModem *modem.Modem
 	for _, m := range modems {
@@ -329,32 +342,32 @@ func (s *Server) handleChannels(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 定义所有预设通道模板
-	channels := []config.ChannelConfig{
-		{
+	// 定义所有预设通道模板（用于补齐用户未配置的通道类型）
+	defaultChannels := map[string]config.ChannelConfig{
+		"email": {
 			Type:              "email",
 			Enabled:           false,
 			RequestTimeoutSec: 10,
 			Port:              587,
 			UseTLS:            true,
 		},
-		{
+		"bark": {
 			Type:              "bark",
 			Enabled:           false,
 			RequestTimeoutSec: 10,
 		},
-		{
+		"gotify": {
 			Type:              "gotify",
 			Enabled:           false,
 			RequestTimeoutSec: 10,
 			Priority:          5,
 		},
-		{
+		"serverchan": {
 			Type:              "serverchan",
 			Enabled:           false,
 			RequestTimeoutSec: 10,
 		},
-		{
+		"webhook": {
 			Type:                "webhook",
 			Enabled:             false,
 			RequestTimeoutSec:   10,
@@ -363,13 +376,20 @@ func (s *Server) handleChannels(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	// 将配置文件中的值合并到模板中
-	for i := range channels {
-		for j := range s.cfg.Channels {
-			if channels[i].Type == s.cfg.Channels[j].Type {
-				channels[i] = s.cfg.Channels[j]
-				break
-			}
+	// 以配置文件中的通道为基础，保留所有已配置的通道（含同类型多个）
+	channels := make([]config.ChannelConfig, len(s.cfg.Channels))
+	copy(channels, s.cfg.Channels)
+
+	// 记录已配置的类型
+	configuredTypes := make(map[string]bool)
+	for _, ch := range channels {
+		configuredTypes[ch.Type] = true
+	}
+
+	// 补齐未配置的类型
+	for typeName, defaultCh := range defaultChannels {
+		if !configuredTypes[typeName] {
+			channels = append(channels, defaultCh)
 		}
 	}
 
@@ -475,7 +495,40 @@ func (s *Server) handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		slog.Info("WebSocket 客户端断开", "remote", r.RemoteAddr)
 	}()
 
-	// 保持连接并处理 ping/pong
+	// 设置心跳检测
+	const (
+		pongWait   = 60 * time.Second
+		pingPeriod = 50 * time.Second // 必须小于 pongWait
+	)
+
+	conn.SetReadDeadline(time.Now().Add(pongWait))
+	conn.SetPongHandler(func(string) error {
+		conn.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
+
+	// 启动 Ping 发送 goroutine
+	done := make(chan struct{})
+	go func() {
+		ticker := time.NewTicker(pingPeriod)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				s.writeMu.Lock()
+				err := conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(10*time.Second))
+				s.writeMu.Unlock()
+				if err != nil {
+					return
+				}
+			case <-done:
+				return
+			}
+		}
+	}()
+	defer close(done)
+
+	// 保持连接并处理消息
 	for {
 		_, _, err := conn.ReadMessage()
 		if err != nil {
@@ -503,7 +556,9 @@ func (s *Server) BroadcastMessage(msg storage.Message) {
 	s.clientsMu.RUnlock()
 
 	for _, client := range clients {
+		s.writeMu.Lock()
 		err := client.WriteMessage(websocket.TextMessage, data)
+		s.writeMu.Unlock()
 		if err != nil {
 			slog.Error("发送 WebSocket 消息失败", "error", err)
 			s.clientsMu.Lock()

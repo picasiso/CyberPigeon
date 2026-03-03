@@ -33,7 +33,7 @@ func (g *GotifyChannel) Type() string {
 
 // Send 发送 Gotify 通知
 func (g *GotifyChannel) Send(msg Message) error {
-	url := fmt.Sprintf("%s/message?token=%s", g.cfg.Endpoint, g.cfg.Token)
+	url := fmt.Sprintf("%s/message", g.cfg.Endpoint)
 	title := msg.From
 	if title == "" {
 		title = "未知号码"
@@ -55,6 +55,7 @@ func (g *GotifyChannel) Send(msg Message) error {
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Gotify-Key", g.cfg.Token)
 
 	resp, err := g.client.Do(req)
 	if err != nil {
