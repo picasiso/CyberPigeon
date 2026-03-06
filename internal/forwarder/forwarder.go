@@ -197,11 +197,7 @@ func (f *Forwarder) handleMessage(m *modem.Modem, sms *modem.SMS) error {
 	// incoming := sms.State == modem.SMSStateReceived || sms.State == modem.SMSStateReceiving
 
 	smsPath := sms.Path()
-	textPreview := sms.Text
-	if len(textPreview) > 20 {
-		textPreview = textPreview[:20]
-	}
-	slog.Info("handleMessage调用", "path", smsPath, "from", sms.Number, "state", sms.State.String(), "text_preview", textPreview)
+	slog.Debug("handleMessage调用", "path", smsPath, "from", sms.Number, "state", sms.State.String())
 
 	// 优先过滤旧消息（避免重启后重复发送）
 	// if incoming && !sms.Timestamp.IsZero() && time.Since(sms.Timestamp) > 5*time.Minute {
@@ -226,7 +222,6 @@ func (f *Forwarder) handleMessage(m *modem.Modem, sms *modem.SMS) error {
 		"imei", m.EquipmentIdentifier,
 		"from", sms.Number,
 		"timestamp", sms.Timestamp,
-		"text", sms.Text,
 	)
 
 	// 保存到存储
