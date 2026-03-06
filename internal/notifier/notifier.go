@@ -1,6 +1,7 @@
 package notifier
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"sync"
@@ -95,14 +96,7 @@ func (n *Notifier) Send(msg Message) error {
 
 	wg.Wait()
 
-	// 返回最后一个错误
-	var lastErr error
-	for _, err := range errs {
-		if err != nil {
-			lastErr = err
-		}
-	}
-	return lastErr
+	return errors.Join(errs...)
 }
 
 // createChannel 根据配置创建通道
