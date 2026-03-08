@@ -11,7 +11,7 @@ enabled = true
 listen = ":8080"  # 监听地址，访问 http://localhost:8080
 # 允许的 WebSocket Origin（可填完整 Origin 或 host:port）。
 # 为空时仅允许同源 Origin。
-allowed_origins = ["http://localhost:8080"]
+allowed_origins = ["*"]
 
 # 通知通道配置
 # 支持多个通道，按顺序尝试发送
