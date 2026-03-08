@@ -67,6 +67,21 @@ type ChannelConfig struct {
 	CorpSecret string `toml:"corp_secret" json:"corp_secret"`
 	AgentID    int    `toml:"agent_id" json:"agent_id"`
 	ToUser     string `toml:"to_user" json:"to_user"`
+
+	// 飞书 (Lark SDK)
+	AppID         string `toml:"app_id" json:"app_id"`                   // 飞书应用 App ID
+	AppSecret     string `toml:"app_secret" json:"app_secret"`           // 飞书应用 App Secret
+	ReceiveID     string `toml:"receive_id" json:"receive_id"`           // 接收者 ID
+	ReceiveIDType string `toml:"receive_id_type" json:"receive_id_type"` // 接收者 ID 类型: open_id, user_id, union_id, email, chat_id
+
+	// 钉钉（Webhook 机器人）
+	WebhookURL string `toml:"webhook_url" json:"webhook_url"` // 钉钉机器人 Webhook 地址
+	SignSecret string `toml:"sign_secret" json:"sign_secret"` // 钉钉签名密钥（可选）
+
+	// Telegram Bot
+	BotToken string `toml:"bot_token" json:"bot_token"` // Telegram Bot Token
+	ChatID   string `toml:"chat_id" json:"chat_id"`     // Telegram 目标 Chat ID
+	APIURL   string `toml:"api_url" json:"api_url"`     // Telegram API 地址 (可选，默认 https://api.telegram.org)
 }
 
 // Load 加载配置文件
@@ -133,6 +148,30 @@ func channelToMap(ch ChannelConfig) map[string]any {
 		m["agent_id"] = ch.AgentID
 		if ch.ToUser != "" {
 			m["to_user"] = ch.ToUser
+		}
+	case "feishu":
+		m["app_id"] = ch.AppID
+		m["app_secret"] = ch.AppSecret
+		m["receive_id"] = ch.ReceiveID
+		if ch.ReceiveIDType != "" {
+			m["receive_id_type"] = ch.ReceiveIDType
+		}
+		if ch.Title != "" {
+			m["title"] = ch.Title
+		}
+	case "dingtalk":
+		m["webhook_url"] = ch.WebhookURL
+		if ch.SignSecret != "" {
+			m["sign_secret"] = ch.SignSecret
+		}
+		if ch.Title != "" {
+			m["title"] = ch.Title
+		}
+	case "telegram":
+		m["bot_token"] = ch.BotToken
+		m["chat_id"] = ch.ChatID
+		if ch.APIURL != "" {
+			m["api_url"] = ch.APIURL
 		}
 	default:
 		// 未知类型：序列化所有非零字段

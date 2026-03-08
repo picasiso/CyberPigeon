@@ -74,3 +74,32 @@ corp_id = "your-corp-id"         # 企业 ID
 corp_secret = "your-app-secret"  # 应用 Secret
 agent_id = 1000002               # 应用 AgentId
 # to_user = "UserID1|UserID2"   # 可选，留空则推送给所有人
+
+# 飞书通道（使用飞书应用 SDK）
+[[channels]]
+type = "feishu"
+enabled = false  # 是否启用此通道
+request_timeout_sec = 10
+app_id = "your-app-id"           # 飞书应用 App ID
+app_secret = "your-app-secret"   # 飞书应用 App Secret
+receive_id = "ou_xxx"            # 接收者 ID
+receive_id_type = "open_id"      # open_id / user_id / union_id / email / chat_id
+# title = "短信通知"              # 可选，消息标题
+
+# 钉钉机器人通道
+[[channels]]
+type = "dingtalk"
+enabled = false  # 是否启用此通道
+request_timeout_sec = 10
+webhook_url = "https://oapi.dingtalk.com/robot/send?access_token=your-token"
+# sign_secret = "SECxxx"  # 可选，加签密钥
+# title = "短信通知"      # 可选，消息前缀
+
+# Telegram Bot 通道
+[[channels]]
+type = "telegram"
+enabled = false  # 是否启用此通道
+request_timeout_sec = 10
+bot_token = "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
+chat_id = "123456789"
+# api_url = "https://api.telegram.org"

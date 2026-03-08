@@ -11,3 +11,5 @@ require (
 	github.com/easychen/serverchan-sdk-golang v1.0.0
 	github.com/gorilla/websocket v1.5.3
 )
+
+require github.com/larksuite/oapi-sdk-go/v3 v3.5.3

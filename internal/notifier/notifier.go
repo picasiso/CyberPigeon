@@ -114,6 +114,12 @@ func createChannel(cfg config.ChannelConfig) (Channel, error) {
 		return NewWebhookChannel(cfg)
 	case "wecom":
 		return NewWeComChannel(cfg)
+	case "feishu":
+		return NewFeishuChannel(cfg)
+	case "dingtalk":
+		return NewDingtalkChannel(cfg)
+	case "telegram":
+		return NewTelegramChannel(cfg)
 	default:
 		return nil, fmt.Errorf("未知通道类型: %s", cfg.Type)
 	}

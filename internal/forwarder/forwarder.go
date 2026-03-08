@@ -254,7 +254,8 @@ func (f *Forwarder) isDuplicateSMS(sms *modem.SMS) bool {
 	}
 
 	// 使用 timestamp+from+text 的哈希作为唯一标识，避免长文本占用过多内存
-	raw := fmt.Sprintf("%s|%d|%s|%s", sms.Path(), sms.Timestamp.UnixNano(), sms.Number, sms.Text)
+	// 不包括 path，因为可能会有路径不同但内容完全相同的重复投递
+	raw := fmt.Sprintf("%d|%s|%s", sms.Timestamp.UnixNano(), sms.Number, sms.Text)
 	h := sha1.Sum([]byte(raw))
 	key := hex.EncodeToString(h[:])
 

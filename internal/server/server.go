@@ -72,7 +72,7 @@ func isOriginAllowed(r *http.Request, allowedOrigins []string) bool {
 		if allowed == "" {
 			continue
 		}
-		if strings.EqualFold(allowed, origin) || strings.EqualFold(allowed, u.Host) {
+		if allowed == "*" || strings.EqualFold(allowed, origin) || strings.EqualFold(allowed, u.Host) {
 			return true
 		}
 	}
