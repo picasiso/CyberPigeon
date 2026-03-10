@@ -10,9 +10,10 @@ import (
 
 // Config 主配置结构
 type Config struct {
-	Storage  StorageConfig   `toml:"storage"`
-	Server   ServerConfig    `toml:"server"`
-	Channels []ChannelConfig `toml:"channels"`
+	Storage    StorageConfig    `toml:"storage"`
+	Server     ServerConfig     `toml:"server"`
+	Forwarding ForwardingConfig `toml:"forwarding" json:"forwarding"`
+	Channels   []ChannelConfig  `toml:"channels"`
 }
 
 // StorageConfig 存储配置
@@ -26,6 +27,12 @@ type ServerConfig struct {
 	Enabled        bool     `toml:"enabled"`         // 是否启用 Web 服务器
 	Listen         string   `toml:"listen"`          // 监听地址，如 ":8080"
 	AllowedOrigins []string `toml:"allowed_origins"` // 允许的 WebSocket Origin 列表，空则仅允许同源
+}
+
+// ForwardingConfig 转发相关配置
+type ForwardingConfig struct {
+	// LocalNumbers 支持按 IMEI 自定义本机号码（用于运营商未回传号码的场景）
+	LocalNumbers map[string]string `toml:"local_numbers" json:"local_numbers"`
 }
 
 // ChannelConfig 通道配置
@@ -202,13 +209,15 @@ func (c *Config) Save(path string) error {
 
 	// 构建用于保存的配置，过滤掉每个通道不相关的字段
 	saveConfig := struct {
-		Storage  StorageConfig `toml:"storage"`
-		Server   ServerConfig  `toml:"server"`
-		Channels []any         `toml:"channels"`
+		Storage    StorageConfig    `toml:"storage"`
+		Server     ServerConfig     `toml:"server"`
+		Forwarding ForwardingConfig `toml:"forwarding"`
+		Channels   []any            `toml:"channels"`
 	}{
-		Storage:  c.Storage,
-		Server:   c.Server,
-		Channels: make([]any, 0, len(c.Channels)),
+		Storage:    c.Storage,
+		Server:     c.Server,
+		Forwarding: c.Forwarding,
+		Channels:   make([]any, 0, len(c.Channels)),
 	}
 
 	for _, ch := range c.Channels {

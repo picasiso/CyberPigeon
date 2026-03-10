@@ -23,11 +23,27 @@ type Message struct {
 // String 返回纯文本格式
 func (m Message) String() string {
 	return fmt.Sprintf(
-		"%s\n\n发送人: %s\n时间: %s",
+		"%s\n\n发送人: %s\n本机号码: %s\n时间: %s",
 		m.displayText(),
 		m.From,
+		m.localNumber(),
 		m.formatTimestamp(),
 	)
+}
+
+func (m Message) localNumber() string {
+	if m.Incoming {
+		if m.To != "" {
+			return m.To
+		}
+		return "未知"
+	}
+
+	if m.From != "" {
+		return m.From
+	}
+
+	return "未知"
 }
 
 func (m Message) displayText() string {

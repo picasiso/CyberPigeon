@@ -91,6 +91,7 @@ func (s *Server) Run(ctx context.Context) error {
 
 	// API 路由
 	mux.HandleFunc("/api/modems", s.handleModems)
+	mux.HandleFunc("/api/forwarding", s.handleForwarding)
 	mux.HandleFunc("/api/messages", s.handleMessages)
 	mux.HandleFunc("/api/messages/delete", s.handleDeleteMessage)
 	mux.HandleFunc("/api/channels", s.handleChannels)
@@ -139,13 +140,14 @@ func (s *Server) Run(ctx context.Context) error {
 
 // ModemInfo 调制解调器信息
 type ModemInfo struct {
-	IMEI          string `json:"imei"`
-	Model         string `json:"model"`
-	Manufacturer  string `json:"manufacturer"`
-	Number        string `json:"number"`
-	SignalQuality uint32 `json:"signal_quality"`
-	OperatorName  string `json:"operator_name"`
-	ICCID         string `json:"iccid"`
+	IMEI              string `json:"imei"`
+	Model             string `json:"model"`
+	Manufacturer      string `json:"manufacturer"`
+	Number            string `json:"number"`
+	CustomLocalNumber string `json:"custom_local_number"`
+	SignalQuality     uint32 `json:"signal_quality"`
+	OperatorName      string `json:"operator_name"`
+	ICCID             string `json:"iccid"`
 }
 
 // handleModems 处理调制解调器信息请求
@@ -164,14 +166,20 @@ func (s *Server) handleModems(w http.ResponseWriter, r *http.Request) {
 		modem.UpdateOperatorName()
 		modem.UpdateICCID()
 
+		customNumber := ""
+		if s.cfg.Forwarding.LocalNumbers != nil {
+			customNumber = s.cfg.Forwarding.LocalNumbers[modem.EquipmentIdentifier]
+		}
+
 		info := ModemInfo{
-			IMEI:          modem.EquipmentIdentifier,
-			Model:         modem.Model,
-			Manufacturer:  modem.Manufacturer,
-			Number:        modem.Number,
-			SignalQuality: modem.SignalQuality,
-			OperatorName:  modem.OperatorName,
-			ICCID:         modem.ICCID,
+			IMEI:              modem.EquipmentIdentifier,
+			Model:             modem.Model,
+			Manufacturer:      modem.Manufacturer,
+			Number:            modem.Number,
+			CustomLocalNumber: customNumber,
+			SignalQuality:     modem.SignalQuality,
+			OperatorName:      modem.OperatorName,
+			ICCID:             modem.ICCID,
 		}
 
 		infos = append(infos, info)
@@ -179,6 +187,57 @@ func (s *Server) handleModems(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(infos)
+}
+
+// handleForwarding 处理转发配置请求
+func (s *Server) handleForwarding(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		w.Header().Set("Content-Type", "application/json")
+		if s.cfg.Forwarding.LocalNumbers == nil {
+			json.NewEncoder(w).Encode(map[string]map[string]string{"local_numbers": {}})
+			return
+		}
+		json.NewEncoder(w).Encode(map[string]map[string]string{"local_numbers": s.cfg.Forwarding.LocalNumbers})
+		return
+	}
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var req struct {
+		LocalNumbers map[string]string `json:"local_numbers"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if req.LocalNumbers == nil {
+		req.LocalNumbers = map[string]string{}
+	}
+
+	cleaned := make(map[string]string, len(req.LocalNumbers))
+	for imei, number := range req.LocalNumbers {
+		imei = strings.TrimSpace(imei)
+		number = strings.TrimSpace(number)
+		if imei == "" || number == "" {
+			continue
+		}
+		cleaned[imei] = number
+	}
+
+	s.cfg.Forwarding.LocalNumbers = cleaned
+	s.forwarder.ReloadForwarding(s.cfg.Forwarding)
+
+	if err := s.cfg.Save(s.configPath); err != nil {
+		http.Error(w, "Failed to save config: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]bool{"success": true})
 }
 
 // handleMessages 处理短信列表请求

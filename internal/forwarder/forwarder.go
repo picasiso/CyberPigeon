@@ -314,12 +314,30 @@ func (f *Forwarder) ReloadChannels(channels []config.ChannelConfig) error {
 	return nil
 }
 
+// ReloadForwarding 重载转发配置
+func (f *Forwarder) ReloadForwarding(forwarding config.ForwardingConfig) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.cfg.Forwarding = forwarding
+}
+
+func (f *Forwarder) resolveLocalNumber(m *modem.Modem) string {
+	if n := strings.TrimSpace(m.Number); n != "" {
+		return n
+	}
+	if f.cfg.Forwarding.LocalNumbers == nil {
+		return ""
+	}
+	return strings.TrimSpace(f.cfg.Forwarding.LocalNumbers[m.EquipmentIdentifier])
+}
+
 // formatMessage 格式化消息
 func (f *Forwarder) formatMessage(m *modem.Modem, sms *modem.SMS) notifier.Message {
 	incoming := sms.State == modem.SMSStateReceived || sms.State == modem.SMSStateReceiving
-	sender, recipient := sms.Number, m.Number
+	localNumber := f.resolveLocalNumber(m)
+	sender, recipient := sms.Number, localNumber
 	if !incoming {
-		sender, recipient = recipient, sender
+		sender, recipient = localNumber, sms.Number
 	}
 
 	modemName := f.getModemName(m)
